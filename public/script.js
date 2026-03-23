@@ -2,6 +2,15 @@ const form = document.getElementById('registration-form');
 const submitBtn = document.getElementById('submit-btn');
 const toast = document.getElementById('toast');
 
+// ── Wake up server on page load ───────────────────────────────────────────────
+(async () => {
+    try {
+        await fetch('https://renewed-mind-1.onrender.com/api/registrants', { method: 'GET' });
+    } catch (_) {
+        // silent — this is just a wake-up ping
+    }
+})();
+
 // ── Utility: show toast ──────────────────────────────────────────────────────
 function showToast(message, type = 'success') {
     toast.textContent = message;
@@ -90,7 +99,7 @@ form.addEventListener('submit', async (e) => {
     setLoading(true);
 
     try {
-        const res = await fetch('https://renewed-mind-2.onrender.com/api/register', {
+        const res = await fetch('https://renewed-mind-1.onrender.com/api/register', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
