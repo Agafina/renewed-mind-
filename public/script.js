@@ -90,7 +90,7 @@ form.addEventListener('submit', async (e) => {
     setLoading(true);
 
     try {
-        const res = await fetch('https://renewed-mind-1.onrender.com/api/register', {
+        const res = await fetch('https://renewed-mind-2.onrender.com/api/register', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
