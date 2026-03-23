@@ -5,21 +5,19 @@ const Registrant = require('../models/Registrant');
 // POST /api/register - Register a new attendee
 router.post('/register', async (req, res) => {
     try {
-        const { name, email } = req.body;
-
-        if (!name || !email) {
-            return res.status(400).json({ success: false, message: 'Name and email are required.' });
+        const { name, email, level, contact, department } = req.body;
+        if (!name || !email || !level || !contact || !department) {
+            return res.status(400).json({ success: false, message: 'All fields are required.' });
         }
-
+        // Normalize email before duplicate check and save
+        const normalizedEmail = email.trim().toLowerCase();
         // Check if email already registered
-        const existing = await Registrant.findOne({ email: email.toLowerCase() });
+        const existing = await Registrant.findOne({ email: normalizedEmail });
         if (existing) {
             return res.status(409).json({ success: false, message: 'This email is already registered.' });
         }
-
-        const registrant = new Registrant({ name, email });
+        const registrant = new Registrant({ name, email: normalizedEmail, level, contact, department });
         await registrant.save();
-
         res.status(201).json({
             success: true,
             message: `🎉 Thank you, ${name}! You've been successfully registered.`,
