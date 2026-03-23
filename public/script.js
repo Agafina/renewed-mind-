@@ -31,12 +31,14 @@ function clearErrors() {
 }
 
 // ── Validate fields client-side ───────────────────────────────────────────────
-function validate(name, email) {
+function validate(name, email, level, contact, department) {
     let valid = true;
+
     if (!name.trim()) {
         setError('name', 'Please enter your full name.');
         valid = false;
     }
+
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!email.trim()) {
         setError('email', 'Please enter your email address.');
@@ -45,6 +47,30 @@ function validate(name, email) {
         setError('email', 'Please enter a valid email address.');
         valid = false;
     }
+
+    const validLevels = ['200', '300', '400', '500', '600'];
+    if (!level) {
+        setError('level', 'Please select your level.');
+        valid = false;
+    } else if (!validLevels.includes(level)) {
+        setError('level', 'Level must be 200, 300, 400, 500, or 600.');
+        valid = false;
+    }
+
+    const contactRegex = /^[+\d\s\-().]{7,20}$/;
+    if (!contact.trim()) {
+        setError('contact', 'Please enter your contact number.');
+        valid = false;
+    } else if (!contactRegex.test(contact.trim())) {
+        setError('contact', 'Please enter a valid contact number.');
+        valid = false;
+    }
+
+    if (!department.trim()) {
+        setError('department', 'Please enter your department.');
+        valid = false;
+    }
+
     return valid;
 }
 
@@ -53,10 +79,13 @@ form.addEventListener('submit', async (e) => {
     e.preventDefault();
     clearErrors();
 
-    const name = document.getElementById('name').value;
-    const email = document.getElementById('email').value;
+    const name       = document.getElementById('name').value;
+    const email      = document.getElementById('email').value;
+    const level      = document.getElementById('level').value;
+    const contact    = document.getElementById('contact').value;
+    const department = document.getElementById('department').value;
 
-    if (!validate(name, email)) return;
+    if (!validate(name, email, level, contact, department)) return;
 
     setLoading(true);
 
@@ -64,7 +93,13 @@ form.addEventListener('submit', async (e) => {
         const res = await fetch('https://renewed-mind-1.onrender.com/api/register', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ name: name.trim(), email: email.trim() }),
+            body: JSON.stringify({
+                name:       name.trim(),
+                email:      email.trim(),
+                level:      level,
+                contact:    contact.trim(),
+                department: department.trim(),
+            }),
         });
 
         const data = await res.json();
@@ -86,8 +121,9 @@ form.addEventListener('submit', async (e) => {
 });
 
 // ── Clear error on input ──────────────────────────────────────────────────────
-['name', 'email'].forEach((id) => {
+['name', 'email', 'level', 'contact', 'department'].forEach((id) => {
     const input = document.getElementById(id);
+    if (!input) return;
     input.addEventListener('input', () => {
         const group = document.getElementById(`group-${id}`);
         const errorEl = document.getElementById(`${id}-error`);
